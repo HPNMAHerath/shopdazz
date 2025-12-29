@@ -1,5 +1,7 @@
+import Banner from '@/components/Banner'
 import Hero from '@/components/Hero'
 import NewArrivals from '@/components/NewArrivals'
+import PopularProducts from '@/components/PopularProducts'
 import React from 'react'
 
 function HOme() {
@@ -7,6 +9,8 @@ function HOme() {
   <>
   <Hero />
   <NewArrivals />
+  <Banner />
+  <PopularProducts />
   </>
   )
 }

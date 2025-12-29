@@ -1,7 +1,10 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import AppContextProvider from "@/context/AppContext";
+import { Toaster } from "react-hot-toast";
+import Provider from "./Provider";
+import { ClerkProvider } from "@clerk/nextjs";
+
 
 const inter = Inter({
   variable: "--font-inter-sans",
@@ -19,14 +22,19 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
+    <ClerkProvider>
     <html lang="en">
       <body
         className={`${inter.variable} antialiased`}
       >
-        <Header />
+        <AppContextProvider>
+          <Toaster />
+          <Provider>
         {children}
-        <Footer />
+        </Provider>
+        </AppContextProvider>
       </body>
     </html>
+    </ClerkProvider>
   );
 }
