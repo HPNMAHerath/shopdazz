@@ -1,5 +1,5 @@
 import { Inngest } from "inngest";
-import { dbConnection } from "./mongodb";
+import  dbConnection  from "./mongodb";
 import User from "@/models/User";
 
 // Create a client to send and receive events
