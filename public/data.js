@@ -43,6 +43,7 @@ export const assets = {
   basketAdd: "/basket-add.svg",
   trash: "/trash.svg",
   back: "/back.svg",
+  uploadArea: "/uploadArea.svg",
   mail: "/mail.svg",
   chaticon,
   dashboardicon,

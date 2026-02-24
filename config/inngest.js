@@ -1,6 +1,7 @@
 import { Inngest } from "inngest";
 import  dbConnection  from "./mongodb";
 import User from "@/models/User";
+import Order from "@/models/Order";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "shopdazz-app" });
@@ -63,4 +64,37 @@ export const syncUserDeleted = inngest.createFunction(
         await dbConnection()
         await User.findByIdAndDelete(id)
     }
+)
+
+// Batch create orders using Inngest
+export const createUserOrders = inngest.createFunction(
+  {
+    id:'create-user-order',
+    //Batch config: process up to 5 events of after 5 seconds
+    batchEvents: {
+      maxSizes: 5,
+      timeout: '5s'
+    }
+
+  },
+  {event: 'order/created'},
+
+  //Handler for batched events
+  async ({events})=>{
+    //Convert incoming events into order documents
+    const orders = events.map(({data})=>({
+      userId: data.userId,
+      items: data.items,
+      amount: data.amount,
+      address: data.address,
+      date: data.date,
+      paymentType: data.paymentType
+    }))
+
+    // iinsert all orders at once
+    await dbConnection()
+    await Order.insertMany(orders)
+
+    return {success: true, processed: orders.length}
+  }
 )

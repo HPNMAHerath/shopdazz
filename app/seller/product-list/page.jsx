@@ -1,13 +1,42 @@
 'use client'
+import Spinner from '@/components/Spinner'
 import { useAppContext } from '@/context/AppContext'
+import axios from 'axios'
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 function ProductList() {
-    const {products} = useAppContext()
+    const {getToken, user} = useAppContext() 
+    const [products, setProducts] = useState([])
+    const [loading, setLoading] = useState(true)
 
-  return (
-    <div className="flex-1 py-10 flex flex-col justify-between">
+    const fetchSellerProducts = async ()=>{
+        try {
+            const token = await getToken()
+
+            const {data} = await axios.get('/api/product/seller-list', {headers: {Authorization: `Bearer ${token}`}})
+            if(data.success){
+                setProducts(data.products)
+                setLoading(false)
+            }else{
+                toast.error(data.message)
+            }
+
+        }catch (error) {
+          toast.error(error.message)
+        }
+    }
+
+    useEffect(()=>{
+        if(user){
+            fetchSellerProducts()
+        }
+    }, [user])
+
+
+  return loading ? <Spinner /> : (
+    <div className="flex-1 py-10 flex flex-col justify-between bg-white h-[99vh] overflow-y-scroll w-full">
             <div className="w-full md:p-10 p-4">
                 <h2 className="pb-4 text-lg font-medium">All Products</h2>
                 <div className="flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20">

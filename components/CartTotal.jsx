@@ -1,19 +1,31 @@
 import { useAppContext } from '@/context/AppContext'
-import { addressDummyData } from '@/public/data'
+import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 function CartTotal() {
-    const {router, currency, getCartAmount, cartItems, setCartItems, user } = useAppContext()
+    const {router, currency, getCartAmount, cartItems, setCartItems, user, getToken } = useAppContext()
     const [showAddress, setShowAddress] = useState(false)
     const [selectAddress, setSelectAddress] = useState(null)
     const [userAddresses, setUserAddresses] = useState([])
     const [paymentType, setPaymentType] = useState("COD")
 
-    const fetchUserAddresses = ()=>{
-        setUserAddresses(addressDummyData)
-        if(addressDummyData.length > 0){
-            setSelectAddress(addressDummyData[0])
-        }
+    const fetchUserAddresses = async ()=>{
+        try {
+            const token = await getToken()
+            const {data} = await axios.post('/api/user/add-address', {headers: { Authorization: `Bearer ${token}`}})
+            if(data.success){
+              setUserAddresses(data.addresses)
+              if(data.addresses.length > 0){
+                setSelectAddress(data.addresses[0])
+            }
+            }else{
+              toast.error(data.message)
+            }
+          } catch (error) {
+            toast.error(error.message)
+          }
+        
     }
 
     useEffect(()=>{

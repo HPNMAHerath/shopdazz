@@ -4,11 +4,12 @@ import CartTotal  from '@/components/CartTotal'
 import Title from '@/components/Title'
 import { useAppContext } from '@/context/AppContext'
 import toast from 'react-hot-toast'
+import axios from 'axios'
 
 
 
 function AddAddress() {
-    const {router, user } = useAppContext()
+    const {router, user, getToken } = useAppContext()
     const [address, setAddress] = useState({
         completeName:"",
         phone:"",
@@ -19,8 +20,27 @@ function AddAddress() {
         streetAddress:"",
     })
 
-    const onChangeHandler = ()=>{
-      
+    const onChangeHandler = (e)=>{
+      const name = e.target.name
+      const value = e.target.value
+
+      setAddress((data)=> ({...data, [name]: value}))
+        }
+
+    const onSubmitHandler = async (e)=>{
+      e.preventDefault()
+      try {
+        const token = await getToken()
+        const {data} = await axios.post('/api/user/add-address', {address}, {headers: { Authorization: `Bearer ${token}`}})
+        if(data.success){
+          toast.success(data.message)
+          router.replace('/cart')
+        }else{
+          toast.error(data.message)
+        }
+      } catch (error) {
+        toast.error(error.message)
+      }
     }
 
     useEffect(()=>{
@@ -37,7 +57,7 @@ function AddAddress() {
       {/* CONTAINER */}
       <div className='flex flex-col xl:flex-row gap-20 xl:gap-28'>
         {/* Laft Side - Form */}
-        <form className='flex flex-2 flex-col gap-3 text-[95%]'>
+        <form onSubmit={onSubmitHandler} className='flex flex-2 flex-col gap-3 text-[95%]'>
           <Title title1={"Delivery"} title2={"Information"} title1Styles={"pb-5"} />
           <input onChange={onChangeHandler} value={address.completeName} type='text' name='completeName' placeholder='Full Name' className='ring-1 ring-slate-900/15 p-1 pl-3 rounded-sm bg-white outline-none' required />
           <input onChange={onChangeHandler} value={address.phone} type='text' name='phone' placeholder='Phone Number' className='ring-1 ring-slate-900/15 p-1 pl-3 rounded-sm bg-white outline-none' required />
