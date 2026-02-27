@@ -13,7 +13,7 @@ function CartTotal() {
     const fetchUserAddresses = async ()=>{
         try {
             const token = await getToken()
-            const {data} = await axios.post('/api/user/add-address', {headers: { Authorization: `Bearer ${token}`}})
+            const {data} = await axios.get('/api/user/get-address', {headers: { Authorization: `Bearer ${token}`}})
             if(data.success){
               setUserAddresses(data.addresses)
               if(data.addresses.length > 0){
@@ -27,6 +27,71 @@ function CartTotal() {
           }
         
     }
+
+    const placeOrder = async ()=>{
+        try {
+            if(!selectAddress){
+                return toast.error("Please select an address")
+            }
+
+            //Convert cart object into API-friendly array
+            const items = Object.entries(cartItems).map(([product, quantity])=>({product, quantity})).filter(item=> item.quantity > 0)
+
+            if(items.length === 0){
+                return toast.error("Cart is empty")
+            }
+
+            const token = await getToken()
+
+            const {data} = await axios.post("/api/order/create", {
+                address: selectAddress._id,
+                items,
+            }, {headers: {Authorization: `Bearer ${token}`}})
+
+            if(data.success){
+                router.replace("/order-confirmation")
+                toast.success(data.message)
+                setCartItems({})
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    const placeOrderStripe = async ()=>{
+        try {
+            if(!selectAddress){
+                return toast.error("Please select an address")
+            }
+
+            //Convert cart object into API-friendly array
+            const items = Object.entries(cartItems).map(([product, quantity])=>({product, quantity})).filter(item=> item.quantity > 0)
+
+            if(items.length === 0){
+                return toast.error("Cart is empty")
+            }
+
+            const token = await getToken()
+
+            const {data} = await axios.post("/api/order/stripe", {
+                address: selectAddress._id,
+                items,
+            }, {headers: {Authorization: `Bearer ${token}`}})
+
+            if(data.success){
+                window.location.href = data.url
+                toast.success(data.message)
+                setCartItems({})
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
 
     useEffect(()=>{
         if(user){
@@ -91,13 +156,12 @@ function CartTotal() {
                 </p>
             </div>
 
-            <button className="w-full py-3 mt-6 cursor-pointer bg-destructive text-white font-medium hover:bg-destructive/90 transition">
+            <button onClick={paymentType === "COD" ?  placeOrder : placeOrderStripe} className="w-full py-3 mt-6 cursor-pointer bg-destructive text-white font-medium hover:bg-destructive/90 transition">
              Place Order
             </button>
         </div>
   )
 
-  
 
 }
 

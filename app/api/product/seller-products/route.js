@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import authSeller from "@/lib/authSeller";
 
 
-// fetch seller products | POST /api/product/add | Private (seller only)
+// fetch seller products | GET /api/product/seller-products | Private (seller only)
 export async function GET(req) {
     try {
         const {userId} = getAuth(req)

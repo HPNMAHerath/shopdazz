@@ -141,6 +141,7 @@ const AppContextProvider = (prop) => {
         getCartAmount,
         user,
         getToken,
+        
 
 
     }

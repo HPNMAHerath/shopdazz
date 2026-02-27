@@ -15,7 +15,7 @@ function ProductList() {
         try {
             const token = await getToken()
 
-            const {data} = await axios.get('/api/product/seller-list', {headers: {Authorization: `Bearer ${token}`}})
+            const {data} = await axios.get('/api/product/seller-products', {headers: {Authorization: `Bearer ${token}`}})
             if(data.success){
                 setProducts(data.products)
                 setLoading(false)

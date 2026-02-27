@@ -4,16 +4,30 @@ import { useAppContext } from "@/context/AppContext"
 import Image from "next/image"
 import Title from "@/components/Title"
 import toast from "react-hot-toast"
-import { orderDummyData } from "@/public/data"
+import axios from "axios"
+import Spinner from "@/components/Spinner"
 
 
 function MyOrders() {
-    const {currency, user} = useAppContext()
+    const {currency, user, getToken} = useAppContext()
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
 
-    const fetchOrders = ()=>{
-        setOrders(orderDummyData)
+    const fetchOrders = async ()=>{
+        try {
+            const  token = await getToken()
+            const {data} = await axios.get('/api/order/list', { headers: { Authorization: `Bearer ${token}`}})
+            if(data.success){
+                setOrders(data.orders)   
+                setLoading(false)
+            
+            }else{
+                toast.error(data.message)
+            }
+
+        } catch (error) {
+            toast.error(error.message)
+        } 
     }
 
     useEffect(()=>{
@@ -21,7 +35,7 @@ function MyOrders() {
             fetchOrders()
         }
     }, [user])
-  return (
+  return loading ? <Spinner /> : (
     <div className="max-padd-container py-28">
       <div className="space-y-4">
         <Title title1={"orders"} title2={"List"} title1Styles={"pb-10"}/>

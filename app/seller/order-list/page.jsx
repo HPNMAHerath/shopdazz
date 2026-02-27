@@ -4,17 +4,29 @@ import { useAppContext } from '@/context/AppContext'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import Spinner from '@/components/Spinner'
-import { orderDummyData } from '@/public/data'
+import axios from 'axios'
 
 
 function OrderList() {
-    const {user, currency} = useAppContext()
+    const {user, currency, getToken} = useAppContext()
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
 
-    const fetchSellerOrders = ()=>{
-        setOrders(orderDummyData)
-        setLoading(false)
+    const fetchSellerOrders = async ()=>{
+        try {
+            const  token = await getToken()
+            const {data} = await axios.get('/api/order/seller-orders', { headers: { Authorization: `Bearer ${token}`}})
+            if(data.success){
+                setOrders(data.orders)   
+                setLoading(false)
+            
+            }else{
+                toast.error(data.message)
+            }
+
+        } catch (error) {
+            toast.error(error.message)
+        } 
     }
 
     useEffect(()=>{

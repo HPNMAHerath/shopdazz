@@ -44,6 +44,7 @@ export const assets = {
   trash: "/trash.svg",
   back: "/back.svg",
   uploadArea: "/uploadArea.svg",
+  tick: "/tick.svg",
   mail: "/mail.svg",
   chaticon,
   dashboardicon,
